@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Mock-KI Bewerbungsgespräch</title>
+</head>
+<body>
+
+<h2>Online Mock-KI Bewerbungsgespräch (Deutsch)</h2>
+<button id="startBtn">Interview starten</button>
+<p id="question"></p>
+<button id="nextBtn" style="display:none;">Antwort fertig → nächste Frage</button>
+
+<script>
+// Vorprogrammierte Antworten / Fragen
+const interviewQuestions = [
+  "Hallo! Willkommen zum kurzen Bewerbungsgespräch. Wie heißen Sie",
+  "Stellen Sie sich bitte in einem Satz kurz vor.",
+  "Wo waren Sie als letztes beschäftigt?",
+  "Vielen Dank, das Interview ist beendet."
+];
+
+let currentQuestion = 0;
+let interviewTimeout;
+
+// Text-to-Speech Funktion
+function speak(text){
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "de-DE";
+  speechSynthesis.speak(utter);
+}
+
+// Starte das Interview
+document.getElementById("startBtn").addEventListener("click", () => {
+  document.getElementById("startBtn").style.display = "none";
+  document.getElementById("nextBtn").style.display = "inline";
+  nextQuestion();
+
+  // 5 Minuten Limit
+  interviewTimeout = setTimeout(() => {
+    document.getElementById("question").innerText = "Interview beendet. Vielen Dank!";
+    speak("Interview beendet. Vielen Dank!");
+    document.getElementById("nextBtn").style.display = "none";
+  }, 300000); // 5 Minuten
+});
+
+// Gehe zur nächsten Frage
+document.getElementById("nextBtn").addEventListener("click", nextQuestion);
+
+function nextQuestion(){
+  if(currentQuestion < interviewQuestions.length){
+    const q = interviewQuestions[currentQuestion];
+    document.getElementById("question").innerText = q;
+    speak(q);
+    currentQuestion++;
+  } else {
+    document.getElementById("question").innerText = "Interview beendet. Vielen Dank!";
+    speak("Interview beendet. Vielen Dank!");
+    document.getElementById("nextBtn").style.display = "none";
+  }
+}
+</script>
+
+</body>
+</html>

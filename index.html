@@ -44,11 +44,7 @@ document.getElementById("startBtn").addEventListener("click", () => {
   const answer = event.results[0][0].transcript;
   console.log("Antwort:", answer);
 
-  // Zeige Meldung erst 3 Sekunden später
-  setTimeout(() => {
-    document.getElementById("question").innerText += "\nAntwort aufgenommen!";
-  }, 50000); // 50000 ms = 3 Sekunden
-};
+  
 
   recognition.onerror = (err) => console.log("Mikrofonfehler:", err);
 

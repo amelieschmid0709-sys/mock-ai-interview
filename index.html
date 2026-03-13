@@ -64,22 +64,27 @@ document.getElementById("startBtn").addEventListener("click", () => {
 });
 
 // Nächste Frage
-document.getElementById("nextBtn").addEventListener("click", nextQuestion);
-
 function nextQuestion(){
-  if(currentQuestion < interviewQuestions.length){
-    const q = interviewQuestions[currentQuestion];
+  if(current < interviewQuestions.length){
+    const q = interviewQuestions[current];
     document.getElementById("question").innerText = q;
     speak(q);
-    recognition.start(); // Mikrofon starten
-    currentQuestion++;
+
+    // Mikrofon starten
+    recognition.start();
+
+    // Antwortzeit abwarten, aber keine Meldung anzeigen
+    setTimeout(() => {
+      recognition.stop(); // Mikrofon stoppen
+      current++;
+    }, answerTimes[current]);
+
   } else {
     document.getElementById("question").innerText = "Interview beendet. Vielen Dank!";
     speak("Interview beendet. Vielen Dank!");
-    document.getElementById("nextBtn").style.display = "none";
-    recognition.stop();
   }
 }
+  
 </script>
 
 </body>

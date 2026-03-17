@@ -50,14 +50,10 @@ function nextQuestion(){
       recognition.start();
 
       questionTimeout = setTimeout(() => {
-        recognition.stop();
-        current++;
-        if(current >= interviewQuestions.length){
-          endInterview();
-        }
-      }, answerTimes[current]);
-    });
-
+  recognition.stop();
+  current++;
+  nextQuestion(); // 👉 automatisch nächste Frage
+}, answerTimes[current]);
   } else {
     endInterview();
   }

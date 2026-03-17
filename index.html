@@ -51,12 +51,21 @@ function nextQuestion(){
     document.getElementById("question").innerText = q;
 
     // 👉 Erst sprechen, dann Mikro starten
+    
+    function stopRecognition(){
+  if(recognition){
+    try {
+      stopRecognition();
+    } catch(e){}
+  }
+}
     speak(q, () => {
 
-      recognition.start();
+      stopRecognition(); // sicherstellen, dass nichts läuft
+recognition.start();
 
       questionTimeout = setTimeout(() => {
-        recognition.stop();
+        stopRecognition();
         current++;
         nextQuestion(); // 👉 automatisch weiter
       }, answerTimes[current]);
@@ -64,18 +73,18 @@ function nextQuestion(){
     });
 
   } else {
-    endInterview();
-  }
-}
-
-// 🔹 Interview beenden
+    
 function endInterview(){
-  try { recognition.stop(); } catch(e){}
-  document.getElementById("question").innerText = "Vielen Dank für Ihre Zeit, das Interview ist beendet.";
+  clearTimeout(questionTimeout);   // Timer stoppen
+  stopRecognition();               // Mikro endgültig stoppen
+
+  document.getElementById("question").innerText =
+    "Vielen Dank für Ihre Zeit, das Interview ist beendet.";
+
   speak("Vielen Dank für Ihre Zeit, das Interview ist beendet.");
+
   document.getElementById("nextBtn").style.display = "none";
 }
-
 // 🔹 Start Button
 document.getElementById("startBtn").addEventListener("click", () => {
 

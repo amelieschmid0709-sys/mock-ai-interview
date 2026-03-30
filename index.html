@@ -14,33 +14,48 @@
 <p id="question"></p>
 
 <script>
-// 🔹 Einleitung (ohne Mikro)
 const introText = "Guten Tag, vielen Dank dass Sie an diesem Bewerbungsgespräch teilnehmen. Ich bin Ihre KI und stelle Ihnen im folgenden Gespräch ein paar Fragen. Lassen Sie uns starten.";
 
-// 🔹 Fragen
 const interviewQuestions = [
   "Wie ist Ihr Name?",
   "Stellen Sie sich bitte in einem Satz kurz vor.",
   "Warum sollten wir Sie einstellen?"
 ];
 
-// 🔹 Antwortzeiten (ms)
 const answerTimes = [6000, 12000, 15000];
 
 let current = 0;
 let recognition;
 let questionTimeout;
 
-// 🔹 Text-to-Speech
+// 🔹 Speech
 function speak(text, callback){
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = "de-DE";
-
-  utter.onend = () => {
-    if(callback) callback();
-  };
-
+  utter.onend = () => callback && callback();
   speechSynthesis.speak(utter);
+}
+
+// 🔹 Stop Mikro
+function stopRecognition(){
+  if(recognition){
+    try {
+      recognition.stop();
+    } catch(e){}
+  }
+}
+
+// 🔹 Interview beenden
+function endInterview(){
+  clearTimeout(questionTimeout);
+  stopRecognition();
+
+  document.getElementById("question").innerText =
+    "Vielen Dank für Ihre Zeit, das Interview ist beendet.";
+
+  speak("Vielen Dank für Ihre Zeit, das Interview ist beendet.");
+
+  document.getElementById("nextBtn").style.display = "none";
 }
 
 // 🔹 Nächste Frage
@@ -50,41 +65,25 @@ function nextQuestion(){
     const q = interviewQuestions[current];
     document.getElementById("question").innerText = q;
 
-    // 👉 Erst sprechen, dann Mikro starten
-    
-    function stopRecognition(){
-  if(recognition){
-    try {
-      stopRecognition();
-    } catch(e){}
-  }
-}
     speak(q, () => {
+      stopRecognition();
 
-      stopRecognition(); // sicherstellen, dass nichts läuft
-recognition.start();
+      try {
+        recognition.start();
+      } catch(e){}
 
       questionTimeout = setTimeout(() => {
         stopRecognition();
         current++;
-        nextQuestion(); // 👉 automatisch weiter
+        nextQuestion();
       }, answerTimes[current]);
-
     });
 
   } else {
-    
-function endInterview(){
-  clearTimeout(questionTimeout);   // Timer stoppen
-  stopRecognition();               // Mikro endgültig stoppen
-
-  document.getElementById("question").innerText =
-    "Vielen Dank für Ihre Zeit, das Interview ist beendet. Klicken Sie nun auf folgenden Link, um zur Umfrage zurück zu gelangen.";
-
-  speak("Vielen Dank für Ihre Zeit, das Interview ist beendet. Klicken Sie nun auf folgenden Link, um zur Umfrage zurück zu gelangen.");
-
-  document.getElementById("nextBtn").style.display = "none";
+    endInterview();
+  }
 }
+
 // 🔹 Start Button
 document.getElementById("startBtn").addEventListener("click", () => {
 
@@ -108,27 +107,24 @@ document.getElementById("startBtn").addEventListener("click", () => {
   document.getElementById("startBtn").style.display = "none";
   document.getElementById("nextBtn").style.display = "inline";
 
-  // 👉 Erst Einleitung, dann Fragen
   document.getElementById("question").innerText = introText;
 
   speak(introText, () => {
     nextQuestion();
   });
 
-  // Gesamtzeit 5 Minuten
   setTimeout(() => {
     endInterview();
   }, 300000);
 });
 
-// 🔹 Nächste Frage Button
+// 🔹 Next Button
 document.getElementById("nextBtn").addEventListener("click", () => {
   clearTimeout(questionTimeout);
-  try { recognition.stop(); } catch(e){}
+  stopRecognition();
   current++;
   nextQuestion();
 });
-
 </script>
 
 </body>
